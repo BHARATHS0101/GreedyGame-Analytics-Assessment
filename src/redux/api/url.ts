@@ -1,0 +1,1 @@
+export const url = 'http://go-dev.greedygame.com/v3/dummy';
