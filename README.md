@@ -1,4 +1,4 @@
-# Minesweeper Game
+# Greedy Game Analytics Assessment
   A simple web application for displaying data in table format.
 
 ## Tech stack 
