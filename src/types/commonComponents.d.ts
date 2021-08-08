@@ -8,4 +8,16 @@ declare namespace CommonComponentsNS {
         isLoading?: boolean;
     }
 
+    interface IColumnsStructure {
+        colName: string | React.ReactNode;
+        keyToSearch: string;
+        className?: string;
+        render?: (...args:any) => React.ReactNode;
+    }
+
+    interface ICommonTableProps {
+        columns: IColumnsStructure[];
+        data: any;
+    }
+
 }

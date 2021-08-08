@@ -16,3 +16,28 @@
     justify-content: flex-start;
     align-items: center;
 }
+
+.tableDisplay {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    justify-content: center;
+    align-items: center;
+    margin-top: 40px;
+}
+
+.appName {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 10px;
+}
+
+.appNameImage {
+    height: 26px;
+    width: 26px;
+}
+
+.clicks {
+    text-align: end;
+}
