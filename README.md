@@ -1,5 +1,5 @@
 # Greedy Game Analytics Assessment
-  A simple web application for displaying data in table format.
+  Single Page Application for displaying data in table format.
 
 ## Tech stack 
   1. **ReactJS**
