@@ -13,13 +13,13 @@ html, body {
 
 .sideBar {
   flex-shrink: 0;
-  flex-basis: 78px;
+  flex-basis: 5vw;
   background-color: #192F48;
   height: 100vh;
 }
 
 .content {
-  flex-basis: 95%;
+  flex-basis: 95vw;
   background-color: #FFFFFF;
   height: 100vh;
   display: flex;

@@ -4,7 +4,6 @@
     flex-direction: column;
     margin: 50px 28px 28px 28px;
     font-family: calibri;
-    overflow-y: auto;
 }
 
 .heading {
@@ -20,7 +19,8 @@
 .tableDisplay {
     height: 100%;
     width: 100%;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: auto;
     justify-content: center;
     align-items: center;
     margin-top: 40px;
