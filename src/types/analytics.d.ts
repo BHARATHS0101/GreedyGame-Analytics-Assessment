@@ -1,20 +1,16 @@
 declare namespace AnalyticsNS {
     
     interface IStructuredAnalyticsData {
-        date: string;
-        app: string;
-        requests: number; 
-        responses: number;
-        impressions: number;
-        clicks: number;
-        revenue: number;
-        fillRate: number;
-        CTR: number;
+        [key:string] : any
     }
 
     interface IArrangeColumns {
         name: string;
         isDisplay: boolean;
+    }
+
+    interface IColumnFilters {
+        [key:string]: APIResponseNS.IEachAppData[] | number;
     }
 
     interface ICachedData {
@@ -30,11 +26,14 @@ declare namespace AnalyticsNS {
         startDate: string;
         endDate: string;
         isLoading: boolean;
+        appsAPIData: APIResponseNS.IEachAppData[];
+        columnFilters: IColumnFilters[];
     }
 
     interface IActionTypes {
         ANALYTICS_SET_INITIAL_DATA: 'ANALYTICS_SET_INITIAL_DATA';
         ANALYTICS_SET_ARRANGE_COLUMNS: 'ANALYTICS_SET_ARRANGE_COLUMNS';
+        ANALYTICS_SET_COLUMN_FILTERS: 'ANALYTICS_SET_COLUMN_FILTERS';
         ANALYTICS_SET_DATES: 'ANALYTICS_SET_DATES';
         ANALYTICS_SET_LOADER: 'ANALYTICS_SET_LOADER';
     }
@@ -46,6 +45,7 @@ declare namespace AnalyticsNS {
             arrangeColumnsData: IArrangeColumns[];
             startDate: string;
             endDate: string;
+            appsAPIData: APIResponseNS.IEachAppData[],
         }
     }
 
@@ -71,11 +71,20 @@ declare namespace AnalyticsNS {
         }
     }
 
+    interface IATSetColumnFilters {
+        type: IActionTypes['ANALYTICS_SET_COLUMN_FILTERS'];
+        payload: {
+            analyticsData: IStructuredAnalyticsData[];
+            columnFilters: IColumnFilters[];
+        }
+    }
+
     type AllActions =
         | IATSetInitialData
         | IATSetArrangeColumns
         | IATSetDates
-        | IATSetLoader;
+        | IATSetLoader
+        | IATSetColumnFilters;
 
     interface IActionCreators {
         setInitialData: (
@@ -87,6 +96,10 @@ declare namespace AnalyticsNS {
         setArrangeColumnsData: (
             arrangeColumnsData: IArrangeColumns[],
         ) => ReduxNS.IThunkFunction<AllActions>; 
+        setColumnFilters: (
+            columnName?: string,
+            filterValue?: APIResponseNS.IEachAppData[] | number,
+        ) => ReduxNS.IThunkFunction<AllActions>;
     }
 
     interface IDateSettingsProps {
@@ -104,6 +117,8 @@ declare namespace AnalyticsNS {
     interface ITableProps {
         arrangeColumnsData: IArrangeColumns[];
         analyticalData: IStructuredAnalyticsData[];
+        appsAPIData: APIResponseNS.IEachAppData[];
+        columnFilters: IColumnFilters[];
     }
 
 }

@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _, { each } from 'lodash';
 
 import {getAnalyticsData, getAppsData} from '../api/apiCalls';
 import History from '../../utils/History';
@@ -40,7 +40,8 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
                             startDate,
                             endDate,
                             analyticsData: data.analyticsAPIData,
-                            arrangeColumnsData: decodeColumns
+                            arrangeColumnsData: decodeColumns,
+                            appsAPIData: data.appsAPIData,
                         }
                     })
                 }else {
@@ -166,6 +167,7 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
                         analyticsData: data.analyticsAPIData,
                         startDate,
                         endDate,
+                        appsAPIData: data.appsAPIData,
                     }
                 })
             }else {
@@ -185,6 +187,7 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
                     endDate,
                     analyticsData: [],
                     arrangeColumnsData: [],
+                    appsAPIData: [],
                 }
             })
         }
@@ -205,6 +208,46 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
             }
         })
     }
+
+    setColumnFilters: AnalyticsNS.IActionCreators['setColumnFilters'] = (
+        columnName,
+        filterValue,
+    ) => async(dispatch, getState) => {
+        const analyticsData = _.cloneDeep(getState().Analytics.analyticsData);
+        const columnFilters = _.cloneDeep(getState().Analytics.columnFilters);
+        if(columnName) {
+            // if(columnName!=='app'){
+            //     const updatedColumnFilters = _.filter(columnFilters, (eachColumnFilter) => {
+            //         return !_.includes(_.keys(eachColumnFilter), columnName);
+            //     });
+            //     console.log(updatedColumnFilters);
+            // }
+            console.log(columnName, filterValue);
+        }else {
+            const filtersArray:AnalyticsNS.IColumnFilters[] = [];
+            const keys = _.keys(analyticsData[0]); 
+            _.map(keys, (eachKey) => {
+                if(eachKey!=='app'){
+                    const filterObject:AnalyticsNS.IColumnFilters = {
+                        [eachKey]: 0,
+                    };
+                    filtersArray.push(filterObject);
+                }else {
+                    const filterObject:AnalyticsNS.IColumnFilters = {
+                        [eachKey]: [],
+                    };
+                    filtersArray.push(filterObject);
+                }
+            });
+            dispatch({
+                type: actionTypes.ANALYTICS_SET_COLUMN_FILTERS,
+                payload: {
+                    columnFilters: filtersArray,
+                    analyticsData: analyticsData,
+                }
+            })
+        }
+    };
 
 };
 

@@ -6,6 +6,7 @@ import './CommonTable.css';
 const CommonTable = (props: CommonComponentsNS.ICommonTableProps) => {
     return (
         <table>
+            <tbody>
             <tr>
             {_.map(props.columns, (eachColumn, key) => {
                 return (
@@ -30,6 +31,7 @@ const CommonTable = (props: CommonComponentsNS.ICommonTableProps) => {
                     </tr>
                 )
             })}
+            </tbody>
         </table>
     )
 }

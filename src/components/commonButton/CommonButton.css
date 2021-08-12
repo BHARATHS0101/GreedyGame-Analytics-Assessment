@@ -12,6 +12,7 @@
     justify-content: center;
     border: none;
     padding: 0px 14px 0px 14px;
+    cursor: pointer;
 }
 
 .buttonDisabled {

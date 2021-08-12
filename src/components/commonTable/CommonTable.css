@@ -1,13 +1,14 @@
 table {
     width: 100%;
+    overflow: scroll;
+    position: relative;
 }
 
 table, th {
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    position: relative;
     background-color: #ffff;
 }
+
 
 table, th, td {
     border-collapse: collapse;

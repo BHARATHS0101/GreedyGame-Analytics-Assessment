@@ -9,6 +9,7 @@ html, body {
   height: 100vh;
   width: 100vw;
   display: flex;
+  align-items: stretch;
 }
 
 .sideBar {
@@ -33,8 +34,9 @@ html, body {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px white;
+  box-shadow: inset 0 0 5px white ;
   border-radius: 10px;
+  background-color: #FFFFFF;
 }
 
 /* Handle */

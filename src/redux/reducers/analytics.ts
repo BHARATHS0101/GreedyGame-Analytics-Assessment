@@ -6,6 +6,8 @@ const initialState: AnalyticsNS.IState = {
     isLoading: true,
     startDate: '',
     endDate: '',
+    appsAPIData: [],
+    columnFilters: [],
 };
 
 const reducer:Reducer<
@@ -21,6 +23,7 @@ const reducer:Reducer<
                 endDate: action.payload.endDate,
                 analyticsData: action.payload.analyticsData,
                 arrangeColumnsData: action.payload.arrangeColumnsData,
+                appsAPIData: action.payload.appsAPIData,
                 isLoading: false,
             }
 
@@ -42,6 +45,13 @@ const reducer:Reducer<
                 startDate: action.payload.startDate,
                 endDate: action.payload.endDate,
             }
+
+        case 'ANALYTICS_SET_COLUMN_FILTERS':
+            return {
+                ...state,
+                columnFilters: action.payload.columnFilters,
+                analyticsData: action.payload.analyticsData,
+            }    
 
         default:
             return {

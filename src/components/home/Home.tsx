@@ -18,18 +18,22 @@ const Home = () => {
         <div className={'mainContainer'}>
             <div className={'heading'}>
                 {'Analytics'}
-            </div>           
+            </div>
+            <div className={'dateSettingsDisplay'}>
             <DateSettings
                 startDate={state.startDate}
                 endDate={state.endDate}
                 arrangeColumnsData={state.arrangeColumnsData}
             />
+            </div>           
             <div className={'tableDisplay'}>
             {state.isLoading ? 
                 <Loader/>:state.analyticsData.length > 0 ? 
                 <Table
                     analyticalData={state.analyticsData}
                     arrangeColumnsData={state.arrangeColumnsData}
+                    appsAPIData={state.appsAPIData}
+                    columnFilters={state.columnFilters}
                 />:<Error/>}
             </div>
         </div>

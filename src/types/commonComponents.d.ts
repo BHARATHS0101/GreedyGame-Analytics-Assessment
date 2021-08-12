@@ -20,4 +20,34 @@ declare namespace CommonComponentsNS {
         data: any;
     }
 
+    interface IData {
+        [key:string]: any
+    }
+
+    interface ISearchProps {
+        data: IData[],
+        keyToSearch: string;
+        onSearch: (...args:any) => void;
+    }
+
+    type Filter = 'search' | 'range';
+
+    interface TableHeader {
+        headerName: string;
+        totalText: string | number;
+        className?: string;
+        filterType?: Filter;
+        filterValue?: number;
+        columnName: string;
+        appsAPIData?: APIResponseNS.IEachAppData[];
+        onChangeFilterValue?: (...args:any) => void;
+        maxValue?: number;
+    } 
+
+    interface InputRangeProps {
+        maxValue: number;
+        value: number;
+        onApplyFilter: (...args:any) => void;
+    }
+
 }
