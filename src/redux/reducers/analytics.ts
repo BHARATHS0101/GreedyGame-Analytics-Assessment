@@ -25,7 +25,8 @@ const reducer:Reducer<
                 analyticsData: action.payload.analyticsData,
                 arrangeColumnsData: action.payload.arrangeColumnsData,
                 appsAPIData: action.payload.appsAPIData,
-                analyticsDataCopy: action.payload.analyticsData,
+                analyticsDataCopy: action.payload.analyticsDataCopy,
+                columnFilters: action.payload.columnFilter,
                 isLoading: false,
             }
 

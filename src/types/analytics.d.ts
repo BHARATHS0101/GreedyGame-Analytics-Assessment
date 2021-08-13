@@ -48,7 +48,7 @@ declare namespace AnalyticsNS {
             startDate: string;
             endDate: string;
             appsAPIData: APIResponseNS.IEachAppData[],
-            columnsFilter: IState['columnFilters'],
+            columnFilter: IState['columnFilters'],
             analyticsDataCopy: IState['analyticsDataCopy']
         }
     }

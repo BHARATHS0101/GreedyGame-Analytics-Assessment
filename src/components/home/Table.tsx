@@ -16,7 +16,9 @@ const Table = (props: AnalyticsNS.ITableProps) => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(actionCreators.setColumnFilters());
+        if(_.size(props.columnFilters) === 0){
+            dispatch(actionCreators.setColumnFilters());
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

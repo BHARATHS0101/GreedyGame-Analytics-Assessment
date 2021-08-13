@@ -47,8 +47,8 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
                                 analyticsData: data.analyticsAPIData,
                                 arrangeColumnsData: decodeColumns,
                                 appsAPIData: data.appsAPIData,
-                                columnsFilter: decodeColumnFilters,
-                                analyticsDataCopy: finalFilterRangeUpdatedItems
+                                columnFilter: decodeColumnFilters,
+                                analyticsDataCopy: finalFilterRangeUpdatedItems,
                             }
                         });
                     }   
@@ -182,7 +182,7 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
                         endDate,
                         appsAPIData: data.appsAPIData,
                         analyticsDataCopy: getState().Analytics.analyticsDataCopy,
-                        columnsFilter: getState().Analytics.columnFilters
+                        columnFilter: getState().Analytics.columnFilters
                     }
                 })
             }else {
@@ -204,7 +204,7 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
                     arrangeColumnsData: [],
                     appsAPIData: [],
                     analyticsDataCopy: [],
-                    columnsFilter: {},
+                    columnFilter: {},
                 }
             })
         }
