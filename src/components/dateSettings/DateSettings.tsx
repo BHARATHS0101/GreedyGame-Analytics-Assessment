@@ -11,28 +11,25 @@ import RightArrow from '../../images/rightArrow.svg';
 import './DateSettings.css';
 
 const DateSettings = (props: AnalyticsNS.IDateSettingsProps) => {
-
+    
     const [isDisplayColumns, setIsDisplayColumns] = useState(false);
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
 
     const dispatch = useDispatch();
 
-    const dispatchActionToSetInitialData = (
-        startDate: string,
-        endDate: string,
-    ) => {
-        dispatch(actionCreators.setInitialData(startDate, endDate));
-    }
+    const dispatchActionToSetInitialData = () => {
+        dispatch(actionCreators.setInitialData());
+    };
+
+    const dispatchActionToSetDates = (startDate: string, endDate: string) => {
+        dispatch(actionCreators.setDates(startDate, endDate));
+    };
+
+    const dispatchActionToArrangeColumns = (arrangeColumnsData: AnalyticsNS.IArrangeColumns[]) => {
+        dispatch(actionCreators.setArrangeColumnsData(arrangeColumnsData));
+    };
 
     useEffect(() => {
-        const newStartDate = new Date();
-        const newEndDate = new Date().toISOString().substr(0,10);
-        newStartDate.setDate(newStartDate.getDate() - 5);
-        const updatedStartDate =newStartDate.toISOString().substr(0,10)
-        setEndDate(newEndDate);
-        setStartDate(updatedStartDate);
-        dispatchActionToSetInitialData(updatedStartDate,newEndDate);
+        dispatchActionToSetInitialData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -45,11 +42,11 @@ const DateSettings = (props: AnalyticsNS.IDateSettingsProps) => {
     };
 
     const handleOnChangeStartDate = (e:React.ChangeEvent<HTMLInputElement>) => {
-        setStartDate(e.target.value);
+        dispatchActionToSetDates(e.target.value, props.endDate);
     };
 
     const handleOnChangeEndDate = (e:React.ChangeEvent<HTMLInputElement>) => {
-        setEndDate(e.target.value);
+        dispatchActionToSetDates(props.startDate, e.target.value);
     };
 
     return (
@@ -60,18 +57,18 @@ const DateSettings = (props: AnalyticsNS.IDateSettingsProps) => {
                     type={'date'}
                     className={'datePicker'}
                     onChange={handleOnChangeStartDate}
-                    value = {startDate}
+                    value = {props.startDate}
                 />
                 <img src={RightArrow} className={'arrowImage'} alt={'date'}/>
                 <input
                     type={'date'}
                     className={'datePicker'}
                     onChange={handleOnChangeEndDate}
-                    value={endDate} 
+                    value={props.endDate} 
                 />
             </div>
             <CommonButton
-                disabled={false}
+                disabled={props.arrangeColumnsData.length === 0}
                 onClick={handleOnSettingsButtonClick}
                 buttonStyle={'settingsButton'}
             >
@@ -82,6 +79,8 @@ const DateSettings = (props: AnalyticsNS.IDateSettingsProps) => {
         {isDisplayColumns?(
             <ArrangeColumns
                 setDisplayArrangeColumns={handleOnSettingsButtonClick}
+                setArrangeColumnsData={dispatchActionToArrangeColumns}
+                arrangeColumnsData={props.arrangeColumnsData}
             />
         ):(null)}
         </>

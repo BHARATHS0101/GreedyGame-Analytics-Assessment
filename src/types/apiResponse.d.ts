@@ -14,4 +14,14 @@ declare namespace APIResponseNS {
         cache_time : number;  
         data: IEachAnalyticsData[];  
     }
+
+    interface IEachAppData {
+        app_id: string;
+        app_name: string;
+    }
+
+    interface IAppsAPIResponse {
+        cache_time : number;  
+        data: IEachAppData[];          
+    }
 }
