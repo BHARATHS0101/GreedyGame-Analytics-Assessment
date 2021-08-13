@@ -9,17 +9,17 @@ export const getAnalyticsData = (
     return axios.get(
         `${url}/report?startDate=${startDate}&endDate=${endDate}`,
         {
-            timeout: 4000,
+            timeout: 10000,
         }
     );
 };
 
 export const getAppsData = (
-):Promise<AxiosResponse<APIResponseNS.IAnalyticsAPIResponseData>> => {
+):Promise<AxiosResponse<APIResponseNS.IAppsAPIResponse>> => {
     return axios.get(
         `${url}/apps`,
         {
-            timeout: 4000,
+            timeout: 10000,
         }
     );
 };

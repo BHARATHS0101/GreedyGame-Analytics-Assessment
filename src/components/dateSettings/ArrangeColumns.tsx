@@ -7,38 +7,12 @@ import './DateSettings.css';
 
 
 const ArrangeColumns = (props: AnalyticsNS.IArrangeColumnsProps) => {
-
+    
+    const [list, setList] = useState<AnalyticsNS.IArrangeColumns[]>([]);
+    
     useEffect(() => {
-        document.cookie = "test=testingCookie";
-    }, []);
-
-    const [list, changeList] = useState([
-        {
-            name: 'date',
-            isEditable: false,
-            isDisplay: true,
-        },
-        {
-            name: 'app',
-            isEditable: false,
-            isDisplay: true,
-        },
-        {
-            name: 'responses',
-            isEditable: true,
-            isDisplay: true,
-        },
-        {
-            name: 'clicks',
-            isEditable: true,
-            isDisplay: true,
-        },
-        {
-            name: 'requests',
-            isEditable: true,
-            isDisplay: true,
-        },
-    ]);
+        setList(props.arrangeColumnsData);
+    }, [props.arrangeColumnsData]);
 
     const [dragging, setDragging] = useState(false);
     const dragItem = useRef<number | null>(null);
@@ -59,9 +33,14 @@ const ArrangeColumns = (props: AnalyticsNS.IArrangeColumnsProps) => {
         if(dragging && dragItem.current!==null && index !== dragItem.current){
             let newList = [...list];    
             newList.splice(index, 0, ...newList.splice(dragItem.current, 1));
-            changeList(newList);
+            setList(newList);
             dragItem.current = index;
         }
+    }
+
+    const handleOnClickApply = () => {
+        props.setArrangeColumnsData(list);
+        props.setDisplayArrangeColumns(false);
     }
 
     const getDragItemClass = (index: number) => {
@@ -75,13 +54,14 @@ const ArrangeColumns = (props: AnalyticsNS.IArrangeColumnsProps) => {
     }
 
     const handleOnClick = (index:number) => {
-        let newList = [...list];
-        if(newList[index].isEditable){
+        const nonEditableColumns = ['app', 'date'];
+        let newList = _.cloneDeep(list);
+        if(!(_.includes(nonEditableColumns, newList[index].name))){
             newList[index].isDisplay = newList[index].isDisplay?false:true;
-            changeList(newList);
+            setList(newList);
         }
     }
-
+    
     return (
         <div className={'listContainer'}>
             <div className={'list'}>    
@@ -110,8 +90,8 @@ const ArrangeColumns = (props: AnalyticsNS.IArrangeColumnsProps) => {
                 />
                 <CommonButton
                     name={'Apply Settings'}
-                    onClick={() => console.log("clicked on apply settings")}
-                    disabled={false}
+                    onClick={handleOnClickApply}
+                    disabled={_.isEqual(list, props.arrangeColumnsData)}
                 />
             </div>
         </div>
