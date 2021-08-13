@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _, { identity } from 'lodash';
 
 import {getAnalyticsData, getAppsData} from '../api/apiCalls';
 import History from '../../utils/History';
@@ -260,14 +260,17 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
         columnRangeFilters: AnalyticsNS.IColumnFilters,
     ) => {
         let updatedRangeFilteredColumns:AnalyticsNS.IStructuredAnalyticsData[] = analyticsData;
-        _.map(columnRangeFilters, (eachColumnRangeFilter, key) => {
-            if(eachColumnRangeFilter > 0 && key!=='app') {
-                const columnsData = _.filter(analyticsData, (eachAnalyticsData) => {
-                    return eachAnalyticsData[key] <= eachColumnRangeFilter;
-                });
-                updatedRangeFilteredColumns = columnsData;
+        _.map(analyticsData, (eachAnalyticalData) => {
+            const validityArray:boolean[] = [] 
+            _.map(columnRangeFilters, (eachColumnFilter, key) => {
+                if(key!=='app' && eachColumnFilter > 0) {
+                    validityArray.push(eachAnalyticalData[key] <= eachColumnFilter);
+                }
+            });
+            if(!_.includes(validityArray, false)){
+                updatedRangeFilteredColumns.push(eachAnalyticalData);
             }
-        });     
+        });
         return updatedRangeFilteredColumns;
     }
 
@@ -295,10 +298,10 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
         if(columnName) { 
             if(typeof filterValue === 'number'){
                 columnFilters[columnName] = filterValue;
-                const updatedAnalyticsData = this.getRangeFilteredColumns(analyticsData, columnFilters);
                 if(typeof columnFilters['app'] !== 'number') {
-                    const finalUpdatedAppsColumnAnalyticsData = this.getFilteredAppsData(updatedAnalyticsData, columnFilters['app']);
-                    this.dispatchColumnFilters(dispatch, columnFilters, finalUpdatedAppsColumnAnalyticsData);
+                    const finalUpdatedAppsColumnAnalyticsData = this.getFilteredAppsData(analyticsData, columnFilters['app']);
+                    const updatedAnalyticsData = this.getRangeFilteredColumns(finalUpdatedAppsColumnAnalyticsData, columnFilters);
+                    this.dispatchColumnFilters(dispatch, columnFilters, updatedAnalyticsData);
                 }
             }else {
                 columnFilters[columnName] = filterValue?filterValue:[];
