@@ -1,1 +1,1 @@
-export const url = 'http://go-dev.greedygame.com/v3/dummy';
+export const url = 'https://go-dev.greedygame.com/v3/dummy';
