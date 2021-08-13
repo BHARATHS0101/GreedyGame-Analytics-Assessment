@@ -7,7 +7,8 @@ const initialState: AnalyticsNS.IState = {
     startDate: '',
     endDate: '',
     appsAPIData: [],
-    columnFilters: [],
+    columnFilters: {},
+    analyticsDataCopy: [],
 };
 
 const reducer:Reducer<
@@ -24,6 +25,7 @@ const reducer:Reducer<
                 analyticsData: action.payload.analyticsData,
                 arrangeColumnsData: action.payload.arrangeColumnsData,
                 appsAPIData: action.payload.appsAPIData,
+                analyticsDataCopy: action.payload.analyticsData,
                 isLoading: false,
             }
 
@@ -50,7 +52,7 @@ const reducer:Reducer<
             return {
                 ...state,
                 columnFilters: action.payload.columnFilters,
-                analyticsData: action.payload.analyticsData,
+                analyticsDataCopy: action.payload.analyticsData,
             }    
 
         default:

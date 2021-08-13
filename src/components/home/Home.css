@@ -74,7 +74,8 @@
 
 .summaryText {
     font-family: Calibri;
-    font-size: 24px;
+    font-size: 22px;
+    font-weight: 500;
     color: #212121;
     font-weight: 500;
 }
@@ -121,5 +122,14 @@
 }
 
 .inputRange {
+    width: 100%;
+}
+
+.inputRanges {
+    display: flex;
+    justify-content: space-between;
+    font-family: Calibri;
+    font-size: 15px;
+    color: #212121;
     width: 100%;
 }

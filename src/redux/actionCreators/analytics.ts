@@ -1,4 +1,4 @@
-import _, { each } from 'lodash';
+import _ from 'lodash';
 
 import {getAnalyticsData, getAppsData} from '../api/apiCalls';
 import History from '../../utils/History';
@@ -27,23 +27,31 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
                 const startDate = queryParams.get('startDate');
                 const endDate = queryParams.get('endDate');
                 const x = queryParams.get('columns') as string;
+                const columnsFilter = queryParams.get('columnFilters') as string;
                 const decodeColumns = JSON.parse(decodeURIComponent(x));
+                const decodeColumnFilters = JSON.parse(decodeURIComponent(columnsFilter));
                 if(startDate!==null && endDate!==null){
                     History.push({
                         pathname: '/analytics',
                         search: '?' + new URLSearchParams(History.location.search)
                     });
                     const data = await this.fetchDataInCache(startDate, endDate);
-                    dispatch({
-                        type: actionTypes.ANALYTICS_SET_INITIAL_DATA,
-                        payload: {
-                            startDate,
-                            endDate,
-                            analyticsData: data.analyticsAPIData,
-                            arrangeColumnsData: decodeColumns,
-                            appsAPIData: data.appsAPIData,
-                        }
-                    })
+                    if(typeof decodeColumnFilters['app'] !== 'number') {
+                        const updatedAnalyticsData = this.getFilteredAppsData(data.analyticsAPIData, decodeColumnFilters['app']);
+                        const finalFilterRangeUpdatedItems = this.getRangeFilteredColumns(updatedAnalyticsData, decodeColumnFilters);
+                        dispatch({
+                            type: actionTypes.ANALYTICS_SET_INITIAL_DATA,
+                            payload: {
+                                startDate,
+                                endDate,
+                                analyticsData: data.analyticsAPIData,
+                                arrangeColumnsData: decodeColumns,
+                                appsAPIData: data.appsAPIData,
+                                columnsFilter: decodeColumnFilters,
+                                analyticsDataCopy: finalFilterRangeUpdatedItems
+                            }
+                        });
+                    }   
                 }else {
                     this.dispatchSetLoader(false, dispatch);
                 }
@@ -103,6 +111,7 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
             appsAPIData: appsAPIData.data.data,
             analyticsAPIData: structuredAnalyticsData,
             arrangeColumnsData: arrangeColumnsData,
+            columnsFilter: this.setInitialColumnFilters(structuredAnalyticsData),
             timeStamp: new Date(),
         };
         return dataToStoreInCache;
@@ -133,14 +142,17 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
         startDate: string,
         endDate: string,
         columns: AnalyticsNS.IState['arrangeColumnsData'],
+        columnFilters: AnalyticsNS.IState['columnFilters'],
     ) => {
         const encodedColumns = encodeURIComponent(JSON.stringify(columns));
+        const encodeColumnFilters = encodeURIComponent(JSON.stringify(columnFilters));
         History.push({
             pathname: '/analytics',
             search: '?' + new URLSearchParams({
                 startDate: startDate,
                 endDate: endDate,
                 columns: encodedColumns,
+                columnFilters: encodeColumnFilters,
             })
         });
     }
@@ -159,6 +171,7 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
                     startDate,
                     endDate,
                     data.arrangeColumnsData,
+                    getState().Analytics.columnFilters,
                 );
                 dispatch({
                     type: actionTypes.ANALYTICS_SET_INITIAL_DATA,
@@ -168,6 +181,8 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
                         startDate,
                         endDate,
                         appsAPIData: data.appsAPIData,
+                        analyticsDataCopy: getState().Analytics.analyticsDataCopy,
+                        columnsFilter: getState().Analytics.columnFilters
                     }
                 })
             }else {
@@ -188,6 +203,8 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
                     analyticsData: [],
                     arrangeColumnsData: [],
                     appsAPIData: [],
+                    analyticsDataCopy: [],
+                    columnsFilter: {},
                 }
             })
         }
@@ -200,6 +217,7 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
             getState().Analytics.startDate,
             getState().Analytics.endDate,
             arrangeColumnsData,
+            getState().Analytics.columnFilters
         );
         dispatch({
             type: actionTypes.ANALYTICS_SET_ARRANGE_COLUMNS,
@@ -209,43 +227,97 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
         })
     }
 
+    dispatchColumnFilters = (
+        dispatch: Dispatch<AnalyticsNS.IATSetColumnFilters>,
+        columnFilters: AnalyticsNS.IColumnFilters,
+        analyticsData: AnalyticsNS.IStructuredAnalyticsData[],
+    ) => {
+        dispatch({
+            type: actionTypes.ANALYTICS_SET_COLUMN_FILTERS,
+            payload: {
+                columnFilters,
+                analyticsData,
+            }
+        });
+    }
+
+    getFilteredAppsData = (
+        analyticsData: AnalyticsNS.IStructuredAnalyticsData[],
+        searchAppColumnData: APIResponseNS.IEachAppData[],
+    ) => {
+        const appNames:string[] = [];
+        _.map(searchAppColumnData, (eachAppDetail) => {
+            appNames.push(_.toLower(eachAppDetail.app_name));
+        });
+        const filteredData = _.filter(analyticsData, (eachAnalyticsData) => {
+            return _.includes(appNames, _.toLower(eachAnalyticsData.app));
+        })
+        return filteredData;
+    }
+
+    getRangeFilteredColumns = (
+        analyticsData: AnalyticsNS.IStructuredAnalyticsData[],
+        columnRangeFilters: AnalyticsNS.IColumnFilters,
+    ) => {
+        let updatedRangeFilteredColumns:AnalyticsNS.IStructuredAnalyticsData[] = analyticsData;
+        _.map(columnRangeFilters, (eachColumnRangeFilter, key) => {
+            if(eachColumnRangeFilter > 0 && key!=='app') {
+                const columnsData = _.filter(analyticsData, (eachAnalyticsData) => {
+                    return eachAnalyticsData[key] <= eachColumnRangeFilter;
+                });
+                updatedRangeFilteredColumns = columnsData;
+            }
+        });     
+        return updatedRangeFilteredColumns;
+    }
+
+    setInitialColumnFilters = (
+        analyticsData: AnalyticsNS.IState['analyticsData'],
+    ) => {
+        const filters:AnalyticsNS.IColumnFilters = {};
+        const keys = _.keys(analyticsData[0]); 
+        _.map(keys, (eachKey) => {
+            if(eachKey!=='app' && eachKey!=='date'){
+                filters[eachKey] = 0;
+            }else if(eachKey==='app'){
+                filters[eachKey] = [];
+            }
+        });
+        return filters;
+    }
+
     setColumnFilters: AnalyticsNS.IActionCreators['setColumnFilters'] = (
         columnName,
         filterValue,
     ) => async(dispatch, getState) => {
         const analyticsData = _.cloneDeep(getState().Analytics.analyticsData);
         const columnFilters = _.cloneDeep(getState().Analytics.columnFilters);
-        if(columnName) {
-            // if(columnName!=='app'){
-            //     const updatedColumnFilters = _.filter(columnFilters, (eachColumnFilter) => {
-            //         return !_.includes(_.keys(eachColumnFilter), columnName);
-            //     });
-            //     console.log(updatedColumnFilters);
-            // }
-            console.log(columnName, filterValue);
+        if(columnName) { 
+            if(typeof filterValue === 'number'){
+                columnFilters[columnName] = filterValue;
+                const updatedAnalyticsData = this.getRangeFilteredColumns(analyticsData, columnFilters);
+                if(typeof columnFilters['app'] !== 'number') {
+                    const finalUpdatedAppsColumnAnalyticsData = this.getFilteredAppsData(updatedAnalyticsData, columnFilters['app']);
+                    this.dispatchColumnFilters(dispatch, columnFilters, finalUpdatedAppsColumnAnalyticsData);
+                }
+            }else {
+                columnFilters[columnName] = filterValue?filterValue:[];
+                const updatedAnalyticsData = this.getFilteredAppsData(analyticsData, filterValue? filterValue:[]);
+                const finalFilterRangeUpdatedItems = this.getRangeFilteredColumns(updatedAnalyticsData, columnFilters);
+                this.dispatchColumnFilters(dispatch, columnFilters, finalFilterRangeUpdatedItems);
+            }
+            this.setQueryParams(
+                getState().Analytics.startDate,
+                getState().Analytics.endDate,
+                getState().Analytics.arrangeColumnsData,
+                columnFilters,
+            );
         }else {
-            const filtersArray:AnalyticsNS.IColumnFilters[] = [];
-            const keys = _.keys(analyticsData[0]); 
-            _.map(keys, (eachKey) => {
-                if(eachKey!=='app'){
-                    const filterObject:AnalyticsNS.IColumnFilters = {
-                        [eachKey]: 0,
-                    };
-                    filtersArray.push(filterObject);
-                }else {
-                    const filterObject:AnalyticsNS.IColumnFilters = {
-                        [eachKey]: [],
-                    };
-                    filtersArray.push(filterObject);
-                }
-            });
-            dispatch({
-                type: actionTypes.ANALYTICS_SET_COLUMN_FILTERS,
-                payload: {
-                    columnFilters: filtersArray,
-                    analyticsData: analyticsData,
-                }
-            })
+            this.dispatchColumnFilters(
+                dispatch, 
+                this.setInitialColumnFilters(analyticsData), 
+                analyticsData
+            );
         }
     };
 

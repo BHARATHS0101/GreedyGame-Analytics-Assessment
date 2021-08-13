@@ -7,8 +7,12 @@ import './Home.css';
 const InputRange = (props: CommonComponentsNS.InputRangeProps) => {
 
     useEffect(() => {
-        setInputRange(props.value);
-    }, [props.value]);
+        if(props.value === 0){
+            setInputRange(props.minValue);
+        }else {
+            setInputRange(props.value);
+        }
+    }, [props.value, props.minValue]);
 
     const [inputRange, setInputRange] = useState(0);
 
@@ -21,22 +25,27 @@ const InputRange = (props: CommonComponentsNS.InputRangeProps) => {
     };
 
     const handleOnClickReset = () => {
-        setInputRange(0);
-        props.onApplyFilter(0);
+        setInputRange(props.maxValue);
+        props.onApplyFilter(props.maxValue);
     };
 
     return (
         <div className={'inputRangeContainer'}>        
-            <div className={'inputContainer'}> 
-                {inputRange} 
+            <div className={'inputContainer'}>  
                 <input
                     type={'range'}
                     max={props.maxValue}
-                    min={0}
+                    min={props.minValue}        
                     value={inputRange}
                     onChange={handleOnInput}
                     className={'inputRange'}
                 />
+                <div className={'inputRanges'}>
+                    {props.minValue}
+                    <div>
+                        {inputRange}
+                    </div>
+                </div>
             </div>
             <div className={'inputRangeButtonsContainer'}>
                 <CommonButton

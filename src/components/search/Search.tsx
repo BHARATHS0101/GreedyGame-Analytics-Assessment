@@ -22,7 +22,11 @@ const Search = (props: CommonComponentsNS.ISearchProps) => {
                 return getItem;
             }
         });
-        props.onSearch(finalSelectedItems); 
+        if(finalSelectedItems.length > 0) {
+            props.onSearch(finalSelectedItems)
+        }else {
+            props.onSearch(props.data);;
+        } 
     };
 
     const searchItemClassName = (searchItemID: string) => {

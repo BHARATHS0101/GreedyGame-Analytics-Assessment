@@ -44,6 +44,7 @@ const TableHeader = (props:CommonComponentsNS.TableHeader) => {
                 <InputRange
                     value={props.filterValue?props.filterValue:0}
                     maxValue={props.maxValue?props.maxValue:0}
+                    minValue={props.minValue?props.minValue:0}
                     onApplyFilter={setFilterValue}
                 />
             }

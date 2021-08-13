@@ -17,42 +17,54 @@ const Table = (props: AnalyticsNS.ITableProps) => {
 
     useEffect(() => {
         dispatch(actionCreators.setColumnFilters());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const dispatchActionToSetColumnFilter = (columnName: string, filterValue: APIResponseNS.IEachAppData[] | number) => {
         dispatch(actionCreators.setColumnFilters(columnName, filterValue));
     }
 
-    const getTotalValue = (colName: string, type: 'number' | 'rate') => {
+    const getTotalValue = (colName: string, type: 'number' | 'rate' | 'currency') => {
         let sum = 0;
-        _.map(props.analyticalData, (eachAnalyticData, index) => {
-            sum= sum + eachAnalyticData[colName];
+        _.map(props.analyticDataCopy, (eachAnalyticData, index) => {
+            sum= sum + eachAnalyticData[colName]??0;
         });
+        const total = _.isNaN(sum/props.analyticDataCopy.length)?0.00:sum/props.analyticDataCopy.length;
         if(type==='rate'){
-            return `${(sum/props.analyticalData.length).toFixed(2)}%`;
-        }else{
+            return `${(total).toFixed(2)}%`;
+        }else if(type === 'currency'){
+            return `$${(total).toFixed(2)}`
+        }else {
             return NumberToUnits(sum);
         }
     };
 
     const getFilterValue = (columnName: string) => {
-        const filterValue = _.find(props.columnFilters, (eachColumnFilter) => {
-            return _.includes(_.keys(eachColumnFilter), columnName)
-        });
-        if(filterValue && typeof filterValue === 'number') return filterValue[columnName];
+        const filterValue = props.columnFilters[columnName];
+        if(filterValue && typeof filterValue === 'number') return filterValue;
     };
 
     const getMaxValue = (colName: string) => {
         const maxValuedData = _.maxBy(props.analyticalData, colName);
-        if(maxValuedData) return maxValuedData[colName];
+        if(maxValuedData) return Math.round(maxValuedData[colName]);
     };
+
+    const getMinValue = (colName: string) => {
+        const minValuedData = _.minBy(props.analyticalData, colName);
+        if(minValuedData) return Math.round(minValuedData[colName]);
+    };
+
+    const getNumberOfApps = () => {
+        const numberOfApps = _.uniqBy(props.analyticDataCopy, 'app');
+        return numberOfApps.length;
+    }
 
     const columns:CommonComponentsNS.IColumnsStructure[] = [
         {
             colName: <TableHeader  
                         headerName={'Date'}
                         className={'alignHeaderStart'}
-                        totalText={`${props.analyticalData.length}`}
+                        totalText={`${props.analyticDataCopy.length}`}
                         columnName={'date'}
                     />,
             keyToSearch: 'date',
@@ -70,7 +82,7 @@ const Table = (props: AnalyticsNS.ITableProps) => {
                         headerName={'App'}
                         className={'alignHeaderStart'} 
                         filterType={'search'}  
-                        totalText={`${props.appsAPIData.length}`} 
+                        totalText={`${getNumberOfApps()}`} 
                         columnName={'app'}
                         onChangeFilterValue={dispatchActionToSetColumnFilter}
                         appsAPIData={props.appsAPIData}
@@ -96,6 +108,7 @@ const Table = (props: AnalyticsNS.ITableProps) => {
                         onChangeFilterValue={dispatchActionToSetColumnFilter}
                         filterValue={getFilterValue('clicks')}
                         maxValue={getMaxValue('clicks')}
+                        minValue={getMinValue('clicks')}
                     />,
             keyToSearch: 'clicks',
             className: 'clicks',
@@ -117,6 +130,7 @@ const Table = (props: AnalyticsNS.ITableProps) => {
                         onChangeFilterValue={dispatchActionToSetColumnFilter}
                         filterValue={getFilterValue('impressions')}
                         maxValue={getMaxValue('impressions')}
+                        minValue={getMinValue('impressions')}
                     />,
             keyToSearch: 'impressions',
             className: 'clicks',
@@ -138,6 +152,7 @@ const Table = (props: AnalyticsNS.ITableProps) => {
                         onChangeFilterValue={dispatchActionToSetColumnFilter}
                         filterValue={getFilterValue('requests')}
                         maxValue={getMaxValue('requests')}
+                        minValue={getMinValue('requests')}
                     />,
             keyToSearch: 'requests',
             className: 'clicks',
@@ -159,6 +174,7 @@ const Table = (props: AnalyticsNS.ITableProps) => {
                         onChangeFilterValue={dispatchActionToSetColumnFilter}
                         filterValue={getFilterValue('responses')}
                         maxValue={getMaxValue('responses')}
+                        minValue={getMinValue('responses')}
                     />,
             keyToSearch: 'responses',
             className: 'clicks',
@@ -175,18 +191,19 @@ const Table = (props: AnalyticsNS.ITableProps) => {
                         headerName={'Revenue'}
                         className={'alignHeaderEnd'}
                         filterType={'range'}
-                        totalText={getTotalValue('revenue', 'number')}
+                        totalText={getTotalValue('revenue', 'currency')}
                         columnName={'revenue'}
                         onChangeFilterValue={dispatchActionToSetColumnFilter}
                         filterValue={getFilterValue('revenue')}
                         maxValue={getMaxValue('revenue')}
+                        minValue={getMinValue('revenue')}
                     />,
             keyToSearch: 'revenue',
             className: 'clicks',
             render: (rowItem: AnalyticsNS.IStructuredAnalyticsData) => {
                 return (
                     <>
-                        {`$${rowItem['revenue'].toFixed(2)}`}
+                        {`$${parseFloat(rowItem['revenue']??0).toFixed(2)}`}
                     </>
                 );
             }
@@ -195,19 +212,20 @@ const Table = (props: AnalyticsNS.ITableProps) => {
             colName: <TableHeader 
                         headerName={'Fill Rate'}
                         className={'alignHeaderEnd'}
-                        filterType={'range'}
+                        // filterType={'range'}
                         totalText={getTotalValue('fillRate', 'rate')}
                         columnName={'fillRate'}
-                        onChangeFilterValue={dispatchActionToSetColumnFilter}
-                        filterValue={getFilterValue('fillRate')}
-                        maxValue={getMaxValue('fillRate')}
+                        // onChangeFilterValue={dispatchActionToSetColumnFilter}
+                        // filterValue={getFilterValue('fillRate')}
+                        // maxValue={getMaxValue('fillRate')}
+                        // minValue={getMinValue('fillRate')}
                     />,
             keyToSearch: 'fillRate',
             className: 'clicks',
             render: (rowItem: AnalyticsNS.IStructuredAnalyticsData) => {
                 return (
                     <>
-                        {`${rowItem.fillRate.toFixed(2)}%`}
+                        {`${parseFloat(rowItem.fillRate).toFixed(2)}%`}
                     </>
                 );
             }
@@ -216,19 +234,20 @@ const Table = (props: AnalyticsNS.ITableProps) => {
             colName: <TableHeader 
                         headerName={'CTR'}
                         className={'alignHeaderEnd'}
-                        filterType={'range'}
+                        // filterType={'range'}
                         totalText={getTotalValue('CTR', 'rate')}
                         columnName={'CTR'}
-                        onChangeFilterValue={dispatchActionToSetColumnFilter}
-                        filterValue={getFilterValue('CTR')}
-                        maxValue={getMaxValue('CTR')}
+                        // onChangeFilterValue={dispatchActionToSetColumnFilter}
+                        // filterValue={getFilterValue('CTR')}
+                        // maxValue={getMaxValue('CTR')}
+                        // minValue={getMinValue('CTR')}
                     />,
             keyToSearch: 'CTR',
             className: 'clicks',
             render: (rowItem: AnalyticsNS.IStructuredAnalyticsData) => {
                 return (
                     <>
-                        {`${rowItem.CTR.toFixed(2)}%`}
+                        {`${parseFloat(rowItem.CTR).toFixed(2)}%`}
                     </>
                 );
             }
@@ -248,7 +267,7 @@ const Table = (props: AnalyticsNS.ITableProps) => {
 
     return (
         <CommonTable 
-            data = {props.analyticalData}
+            data = {props.analyticDataCopy}
             columns = {getArrangedColumns()}
         />   
     )

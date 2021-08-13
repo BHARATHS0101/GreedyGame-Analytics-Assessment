@@ -18,16 +18,18 @@ declare namespace AnalyticsNS {
         analyticsAPIData: IStructuredAnalyticsData[],
         arrangeColumnsData: IArrangeColumns[],
         timeStamp: Date,
+        columnsFilter: IColumnFilters;
     }
 
     interface IState {
         analyticsData: IStructuredAnalyticsData[];
+        analyticsDataCopy: IStructuredAnalyticsData[];
         arrangeColumnsData: IArrangeColumns[];
         startDate: string;
         endDate: string;
         isLoading: boolean;
         appsAPIData: APIResponseNS.IEachAppData[];
-        columnFilters: IColumnFilters[];
+        columnFilters: IColumnFilters;
     }
 
     interface IActionTypes {
@@ -46,6 +48,8 @@ declare namespace AnalyticsNS {
             startDate: string;
             endDate: string;
             appsAPIData: APIResponseNS.IEachAppData[],
+            columnsFilter: IState['columnFilters'],
+            analyticsDataCopy: IState['analyticsDataCopy']
         }
     }
 
@@ -75,7 +79,7 @@ declare namespace AnalyticsNS {
         type: IActionTypes['ANALYTICS_SET_COLUMN_FILTERS'];
         payload: {
             analyticsData: IStructuredAnalyticsData[];
-            columnFilters: IColumnFilters[];
+            columnFilters: IColumnFilters;
         }
     }
 
@@ -117,8 +121,9 @@ declare namespace AnalyticsNS {
     interface ITableProps {
         arrangeColumnsData: IArrangeColumns[];
         analyticalData: IStructuredAnalyticsData[];
+        analyticDataCopy: IStructuredAnalyticsData[];
         appsAPIData: APIResponseNS.IEachAppData[];
-        columnFilters: IColumnFilters[];
+        columnFilters: IColumnFilters;
     }
 
 }

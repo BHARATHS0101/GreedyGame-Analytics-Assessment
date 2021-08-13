@@ -34,6 +34,7 @@ const Home = () => {
                     arrangeColumnsData={state.arrangeColumnsData}
                     appsAPIData={state.appsAPIData}
                     columnFilters={state.columnFilters}
+                    analyticDataCopy={state.analyticsDataCopy}
                 />:<Error/>}
             </div>
         </div>

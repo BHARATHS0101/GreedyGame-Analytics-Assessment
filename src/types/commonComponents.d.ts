@@ -42,12 +42,14 @@ declare namespace CommonComponentsNS {
         appsAPIData?: APIResponseNS.IEachAppData[];
         onChangeFilterValue?: (...args:any) => void;
         maxValue?: number;
+        minValue?: number;
     } 
 
     interface InputRangeProps {
         maxValue: number;
         value: number;
         onApplyFilter: (...args:any) => void;
+        minValue: number
     }
 
 }
