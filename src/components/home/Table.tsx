@@ -29,7 +29,9 @@ const Table = (props: AnalyticsNS.ITableProps) => {
     const getTotalValue = (colName: string, type: 'number' | 'rate' | 'currency') => {
         let sum = 0;
         _.map(props.analyticDataCopy, (eachAnalyticData, index) => {
-            sum= sum + eachAnalyticData[colName]??0;
+            if(eachAnalyticData[colName]){
+                sum= sum + eachAnalyticData[colName];
+            }
         });
         const total = _.isNaN(sum/props.analyticDataCopy.length)?0.00:sum/props.analyticDataCopy.length;
         if(type==='rate'){
