@@ -298,11 +298,14 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
         if(columnName) { 
             if(typeof filterValue === 'number'){
                 columnFilters[columnName] = filterValue;
-                if(typeof columnFilters['app'] !== 'number') {
-                    const finalUpdatedAppsColumnAnalyticsData = this.getFilteredAppsData(analyticsData, columnFilters['app']);
-                    const updatedAnalyticsData = this.getRangeFilteredColumns(finalUpdatedAppsColumnAnalyticsData, columnFilters);
-                    this.dispatchColumnFilters(dispatch, columnFilters, updatedAnalyticsData);
+                let finalUpdatedAppsColumnAnalyticsData:AnalyticsNS.IStructuredAnalyticsData[] = analyticsData;
+                if(typeof columnFilters['app'] !== 'number' && columnFilters['app'].length > 0) {
+                    finalUpdatedAppsColumnAnalyticsData = this.getFilteredAppsData(
+                                                            finalUpdatedAppsColumnAnalyticsData, 
+                                                            columnFilters['app']);
                 }
+                const updatedAnalyticsData = this.getRangeFilteredColumns(finalUpdatedAppsColumnAnalyticsData, columnFilters);
+                this.dispatchColumnFilters(dispatch, columnFilters, updatedAnalyticsData);
             }else {
                 columnFilters[columnName] = filterValue?filterValue:[];
                 const updatedAnalyticsData = this.getFilteredAppsData(analyticsData, filterValue? filterValue:[]);
