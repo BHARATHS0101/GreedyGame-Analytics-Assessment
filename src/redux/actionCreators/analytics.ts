@@ -1,4 +1,4 @@
-import _, { identity } from 'lodash';
+import _ from 'lodash';
 
 import {getAnalyticsData, getAppsData} from '../api/apiCalls';
 import History from '../../utils/History';
@@ -111,7 +111,7 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
             appsAPIData: appsAPIData.data.data,
             analyticsAPIData: structuredAnalyticsData,
             arrangeColumnsData: arrangeColumnsData,
-            columnsFilter: this.setInitialColumnFilters(structuredAnalyticsData),
+            columnsFilter: this.setInitialColumnFilters(structuredAnalyticsData,appsAPIData.data.data),
             timeStamp: new Date(),
         };
         return dataToStoreInCache;
@@ -171,7 +171,7 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
                     startDate,
                     endDate,
                     data.arrangeColumnsData,
-                    getState().Analytics.columnFilters,
+                    data.columnsFilter,
                 );
                 dispatch({
                     type: actionTypes.ANALYTICS_SET_INITIAL_DATA,
@@ -181,8 +181,8 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
                         startDate,
                         endDate,
                         appsAPIData: data.appsAPIData,
-                        analyticsDataCopy: getState().Analytics.analyticsDataCopy,
-                        columnFilter: getState().Analytics.columnFilters
+                        analyticsDataCopy: data.analyticsAPIData,
+                        columnFilter: data.columnsFilter,
                     }
                 })
             }else {
@@ -276,6 +276,7 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
 
     setInitialColumnFilters = (
         analyticsData: AnalyticsNS.IState['analyticsData'],
+        appsData: APIResponseNS.IEachAppData[],
     ) => {
         const filters:AnalyticsNS.IColumnFilters = {};
         const keys = _.keys(analyticsData[0]); 
@@ -283,7 +284,7 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
             if(eachKey!=='app' && eachKey!=='date'){
                 filters[eachKey] = 0;
             }else if(eachKey==='app'){
-                filters[eachKey] = [];
+                filters[eachKey] = [...appsData];
             }
         });
         return filters;
@@ -321,7 +322,7 @@ class ActionCreators implements AnalyticsNS.IActionCreators {
         }else {
             this.dispatchColumnFilters(
                 dispatch, 
-                this.setInitialColumnFilters(analyticsData), 
+                this.setInitialColumnFilters(analyticsData, getState().Analytics.appsAPIData), 
                 analyticsData
             );
         }
